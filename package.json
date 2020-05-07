@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "node-fetch": "^2.6.0",
+    "prettier": "^2.0.5",
+    "telegraf": "^3.38.0"
+  },
+  "scripts": {
+    "s": "node main.js"
+  }
+}
