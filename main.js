@@ -25,6 +25,8 @@ bot.command("hide", async (ctx) => {
     junior_user: {
       telegram_id: ctx.message.from.id,
       active: false,
+      chat_id: ctx.message.chat.id,
+      telegram_username: ctx.message.from.username,
     },
   };
   createOrUpdateUser(data);
@@ -40,6 +42,8 @@ bot.command("show", async (ctx) => {
     junior_user: {
       telegram_id: ctx.message.from.id,
       active: true,
+      chat_id: ctx.message.chat.id,
+      telegram_username: ctx.message.from.username,
     },
   };
   createOrUpdateUser(data);
@@ -54,6 +58,8 @@ bot.on("photo", (ctx) => {
     junior_user: {
       telegram_id: ctx.message.from.id,
       active: true,
+      chat_id: ctx.message.chat.id,
+      telegram_username: ctx.message.from.username,
     },
   });
   if (session.step === "photo") {
@@ -103,6 +109,8 @@ bot.on("text", async (ctx) => {
           username: session.username,
           stack: session.stack,
           experience: ctx.message.text,
+          chat_id: ctx.message.chat.id,
+          telegram_username: ctx.message.from.username,
         },
       };
       createOrUpdateUser(data);
