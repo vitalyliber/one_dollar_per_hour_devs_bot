@@ -10,6 +10,7 @@
     "node": "14.2.0"
   },
   "scripts": {
-    "s": "node main.js"
+    "s": "node main.js",
+    "deploy": "git push dokku@casply.com:juniors_bot master"
   }
 }
