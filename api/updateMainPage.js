@@ -7,7 +7,9 @@ const updateMainPage = () => {
       "Content-type": "application/json",
     },
     method: "GET",
-  }).catch((e) => console.log(e.response, e));
+  })
+    .then(() => {})
+    .catch((e) => console.log(e.response, e));
 };
 
 module.exports = updateMainPage;
