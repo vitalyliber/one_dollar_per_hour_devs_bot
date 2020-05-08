@@ -12,7 +12,10 @@ const updateUserAvatar = async (params) => {
       headers: {
         "Content-type": "application/json",
       },
-      params,
+      params: {
+        secret: process.env.SECRET,
+        ...params
+      },
       data: null,
       method: "GET",
     });

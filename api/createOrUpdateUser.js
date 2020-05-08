@@ -6,7 +6,10 @@ const createOrUpdateUser = (data) => {
     headers: {
       "Content-type": "application/json",
     },
-    data,
+    data: {
+      secret: process.env.SECRET,
+      ...data,
+    },
     method: "PUT",
   })
     .then(({ data }) => {
