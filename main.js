@@ -30,8 +30,8 @@ bot.command("hide", async (ctx) => {
     },
   };
   createOrUpdateUser(data);
+  await updateMainPage();
   ctx.reply(`Профиль был скрыт ${baseUrl}`);
-  updateMainPage();
 });
 bot.command("show", async (ctx) => {
   const profile = await getProfile({ telegram_id: ctx.message.from.id });
@@ -47,10 +47,10 @@ bot.command("show", async (ctx) => {
     },
   };
   createOrUpdateUser(data);
+  await updateMainPage();
   ctx.reply(`Профиль был открыт ${baseUrl}`);
-  updateMainPage();
 });
-bot.on("photo", (ctx) => {
+bot.on("photo", async (ctx) => {
   console.log(ctx.message);
   const file_id = ctx.message.photo[ctx.message.photo.length - 1].file_id;
   updateUserAvatar({
@@ -62,13 +62,13 @@ bot.on("photo", (ctx) => {
       telegram_username: ctx.message.from.username,
     },
   });
+  await updateMainPage();
   if (session.step === "photo") {
     session.step = null;
     ctx.reply(`Профиль активирован! 💖 ${baseUrl}\n/help`);
   } else {
     ctx.reply(`Фото профиля обновлено! 💈 ${baseUrl}\n/help`);
   }
-  updateMainPage();
 });
 bot.on("text", async (ctx) => {
   console.log(ctx.message);
@@ -116,6 +116,7 @@ bot.on("text", async (ctx) => {
       createOrUpdateUser(data);
       session.step = "photo";
       const profile = await getProfile({ telegram_id: ctx.message.from.id });
+      await updateMainPage();
       if (profile.image) {
         return ctx.reply(`Информация в профиле была обновлена 🐰\n${baseUrl}\n/help`);
       } else {
