@@ -1,6 +1,7 @@
 const updateUserAvatar = require("./api/updateUserAvatar");
 const createOrUpdateUser = require("./api/createOrUpdateUser");
 const updateMainPage = require("./api/updateMainPage");
+const getProfile = require("./api/getProfile");
 
 require("dotenv").config();
 const Telegraf = require("telegraf");
@@ -15,11 +16,11 @@ bot.use(session());
 bot.start((ctx) => {
   session.step = "username";
   ctx.reply(
-    "Привет джуниор разработчик!\nНет опыта разработки? 🥺\n Но есть сильное желание прокачаться? 🤓\n Регистрируйся и получи шанс найти работу за 1 доллар в час 💵\n\nВведи имя и фамилию для резюме (1/3 шагов | /stop чтобы прервать)"
+    "Привет джуниор разработчик!\nНет опыта разработки? 🥺\nНо есть сильное желание прокачаться?🤓\nРегистрируйся и получи шанс найти работу за 1 доллар в час 💵\n\nВведи имя и фамилию для резюме (1/3 шагов | /stop чтобы прервать)"
   );
 });
 bot.help((ctx) => ctx.reply(helpText));
-bot.command("hide", (ctx) => {
+bot.command("hide", async (ctx) => {
   const data = {
     junior_user: {
       telegram_id: ctx.message.from.id,
@@ -30,7 +31,11 @@ bot.command("hide", (ctx) => {
   ctx.reply(`Профиль был скрыт ${baseUrl}`);
   updateMainPage();
 });
-bot.command("show", (ctx) => {
+bot.command("show", async (ctx) => {
+  const profile = await getProfile({ telegram_id: ctx.message.from.id });
+  if (!profile.image) {
+    return ctx.reply(`Загрузите фото, чтобы отпрыть профиль`);
+  }
   const data = {
     junior_user: {
       telegram_id: ctx.message.from.id,
@@ -51,14 +56,15 @@ bot.on("photo", (ctx) => {
       active: true,
     },
   });
-  if (session.step === 'photo') {
+  if (session.step === "photo") {
+    session.step = null;
     ctx.reply(`Профиль активирован! 💖 ${baseUrl}\n/help`);
   } else {
     ctx.reply(`Фото профиля обновлено! 💈 ${baseUrl}\n/help`);
   }
   updateMainPage();
 });
-bot.on("text", (ctx) => {
+bot.on("text", async (ctx) => {
   console.log(ctx.message);
   if (ctx.message.text === "/stop") {
     session.step = null;
@@ -100,10 +106,15 @@ bot.on("text", (ctx) => {
         },
       };
       createOrUpdateUser(data);
-      session.step = 'photo';
-      return ctx.reply(
-        "Спасибо за регистрацию!\nЧтобы активировать профиль отравьте ваше фото в чат.\n/help"
-      );
+      session.step = "photo";
+      const profile = await getProfile({ telegram_id: ctx.message.from.id });
+      if (profile.image) {
+        return ctx.reply(`Фото профиля было обновлено\n ${baseUrl}`);
+      } else {
+        return ctx.reply(
+          "Спасибо за регистрацию!\nЧтобы активировать профиль отравьте ваше фото в чат.\n/help"
+        );
+      }
     } else {
       return ctx.reply("Попробуй отправить сообщение об опыте/курсах снова");
     }
